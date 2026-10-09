@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
+import EquityCurve from "@/components/EquityCurve";
+import Insights from "@/components/Insights";
 import Ledger from "@/components/Ledger";
 import TradeForm from "@/components/TradeForm";
 import { summarize, withResults } from "@/lib/journal/calc";
@@ -43,11 +45,21 @@ export default function Home() {
 
       <div className="grid">
         <TradeForm onSave={saveTrade} />
-        <section className="ledger">
-          <h2>Ledger</h2>
-          <Ledger trades={rows} onDelete={deleteTrade} />
-          <p className="foot">Net PnL is price move times size, minus fees. R is net PnL divided by the amount risked between entry and stop. Trades are saved in this browser.</p>
-        </section>
+        <div className="main">
+          <section>
+            <h2>Equity curve</h2>
+            <EquityCurve trades={rows} />
+          </section>
+          <section>
+            <h2>Ledger</h2>
+            <Ledger trades={rows} onDelete={deleteTrade} />
+            <p className="foot">Net PnL is price move times size, minus fees. R is net PnL divided by the amount risked between entry and stop. Trades are saved in this browser.</p>
+          </section>
+          <section>
+            <h2>Review</h2>
+            <Insights trades={rows} />
+          </section>
+        </div>
       </div>
     </main>
   );

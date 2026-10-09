@@ -61,6 +61,7 @@ export default function TradeForm({ onSave }: { onSave: (t: Trade) => void }) {
     e.preventDefault();
     const fail = (text: string) => setMessage({ text, error: true });
     if (!f.symbol.trim()) return fail("Enter the market, for example PERP_BTC_USDC.");
+    if (f.date && f.date > today()) return fail("The close date can't be in the future.");
     if (size === undefined || size <= 0) return fail("Size must be a number above zero.");
     if (entry === undefined || entry <= 0 || exit === undefined || exit <= 0)
       return fail("Entry and exit prices must be numbers above zero.");
