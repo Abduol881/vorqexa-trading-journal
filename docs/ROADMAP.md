@@ -1,40 +1,31 @@
 # Roadmap
 
-## 1. Repository foundation
-- [ ] Installable app scaffold
-- [ ] Lint, typecheck, tests, and production build in CI
-- [ ] Environment validation and setup documentation
+## Foundation
+- [x] Layered code structure and product/security docs
+- [x] Trade domain model, input schema, pure PnL helper and unit tests
+- [x] Initial database schema and user-scoped RLS
+- [ ] Install dependencies and verify build/typecheck/lint/tests
+- [ ] Validate migration in a disposable Supabase project
 
-## 2. Authentication and data security
-- [ ] Separate Supabase project
-- [ ] Authentication and protected server routes
-- [ ] Schema migrations and row-level security
-- [ ] Cross-user isolation tests
+## Milestone 1: secure account
+- [ ] Sign up/in/out and password recovery
+- [ ] Session refresh and protected routes
+- [ ] Profile preferences and timezone
+- [ ] Automated cross-user RLS tests
 
-## 3. Manual trade management
-- [ ] Trade data model and validation
-- [ ] Create/edit/delete trade flows
-- [ ] History filters and pagination
-- [ ] Fees, partial closes, and duplicate handling tests
+## Milestone 2: manual journal
+- [ ] Authenticated trade CRUD
+- [ ] Notes, tags, filtering and pagination
+- [ ] Real database-backed dashboard and analytics
+- [ ] Test PnL edge cases and form errors
 
-## 4. Analytics
-- [ ] Deterministic financial calculations
-- [ ] Known-answer test fixtures
-- [ ] Dashboard and equity/drawdown charts
-- [ ] Metric definitions in the interface
+## Milestone 3: portability
+- [ ] CSV preview/import/deduplication
+- [ ] User-controlled export and account deletion
+- [ ] Backup and restore procedure
 
-## 5. Journal and import
-- [ ] Notes, tags, plans, and reviews
-- [ ] CSV preview and validation
-- [ ] Export and account deletion
+## Milestone 4: optional integration
+- [ ] Verify official Orderly API access and permissions
+- [ ] Read-only adapter, explicit consent, reconciliation and sync status
 
-## 6. Orderly integration
-- [ ] Verify official API endpoints, permissions, and account mapping
-- [ ] Implement adapter and normalized model
-- [ ] Idempotent imports, retries, and reconciliation
-- [ ] Sync status and error visibility
-
-## 7. Production readiness
-- [ ] Staging and production configuration
-- [ ] Monitoring and tested recovery
-- [ ] End-to-end, accessibility, and security tests
+Do not call this production-ready until security tests, migrations, recovery, data export/deletion, and deployment configuration are verified.

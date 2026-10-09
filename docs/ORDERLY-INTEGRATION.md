@@ -1,16 +1,14 @@
-# Orderly Integration Research
+# Orderly integration boundary
 
-This document is a research checklist, not a claim that any particular credential or endpoint provides access.
+Orderly sync is optional and later. Manual entry and CSV must remain useful without it.
 
-Before implementing sync, verify from current official Orderly documentation:
+Before implementation:
+1. Verify current official Orderly docs, endpoints, auth scheme, and data permissions.
+2. Do not assume a broker ID or DEX Creator configuration grants private user trade-history access.
+3. Obtain explicit user consent and disclose imported data.
+4. Keep provider types inside an adapter and map into the normalized journal model.
+5. Use stable external IDs; handle pagination, partial fills, fees, funding, corrections and rate limits.
+6. Never request seed phrases/private keys or store withdrawal-enabled credentials.
+7. Test duplicate imports, retries, revoked access and provider outages.
 
-- Which endpoints expose historical executions/fills, order history, fees, funding, and realized PnL.
-- Whether a public indexer can retrieve the required history for the verified account.
-- Whether private endpoints require user-authorized credentials and which scopes are available.
-- How wallet ownership, Orderly account IDs, and subaccounts are mapped.
-- Pagination, retention, rate limits, and correction semantics.
-- Whether a DEX Creator API key or broker ID is unrelated to private user-history authorization.
-
-Never assume a broker ID grants access to all users' private data. Never request wallet seed phrases or private keys.
-
-Fallback: manual trade entry and CSV import must remain available if reliable authorized synchronization cannot be implemented.
+Suggested future module: `src/features/integrations/orderly/{api-client,schemas,mapper,sync-service}.ts`. No live integration exists in this foundation.

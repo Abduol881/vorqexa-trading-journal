@@ -1,31 +1,26 @@
 # Architecture
 
-## Initial shape
-
-A single Next.js application, a separate Supabase project, and PostgreSQL. Avoid microservices until concrete scaling or isolation requirements justify them.
-
 ## Layers
+- `src/app`: routing, page composition, route handlers.
+- `src/components`: shared presentation only.
+- `src/features/trades/domain`: framework-independent trade types and calculations.
+- `src/features/trades/application`: input validation and use-case boundary.
+- `src/features/trades/data`: repository contract; implement against the authenticated Supabase session.
+- `src/features/analytics`: pure summaries derived from domain trade records.
+- `src/lib/supabase`: browser/server clients; never expose service-role credentials.
+- `supabase/migrations`: schema, constraints and RLS.
 
-- UI: pages, accessible components, forms, charts.
-- Features: trade management, journal notes, analytics, account settings.
-- Domain: validated types and deterministic financial calculations.
-- Server: authorization, request validation, database access, and integration adapters.
-- Persistence: PostgreSQL migrations, constraints, and row-level security.
-- Integration workers: scheduled sync jobs added only after provider access is verified.
+## Dependency direction
+Routes call application services; services validate and use repositories; repositories persist under the verified session. Domain math must not depend on UI, Next.js, or Supabase. Analytics must reuse domain PnL rules.
 
-## Data flow
+## Core entities
+Profile, Trade, JournalEntry, Tag, and TradeTag. A future attachments feature should keep object storage private and authorize each read/write.
 
-1. Authenticate the user.
-2. Validate input on the server.
-3. Enforce ownership in both server logic and database RLS.
-4. Persist normalized records.
-5. Calculate metrics from canonical records.
-6. Present values with definitions and date/time context.
+## Accounting
+Long gross PnL = (exit - entry) × quantity. Short gross PnL = (entry - exit) × quantity. Net PnL = gross PnL - fees + funding; funding is a signed cash flow, positive when received. Open trades have no realized PnL. Closed trades require exit price and close timestamp. Multi-fill execution/lot modeling may be required before reliable exchange sync.
 
-## Independence
+## Tenant isolation
+Supabase Auth identifies the user. Every user-owned table requires RLS. Server operations derive identity from the verified session—not a request-body user ID. Repository user scoping is defense in depth; RLS is authoritative.
 
-Do not import source files or secrets from the Vorqexa DEX repository. Any future cross-product integration must use a documented and authenticated interface.
-
-## Financial data
-
-Use appropriate decimal precision for prices, quantities, fees, and monetary values. Avoid relying on binary floating-point arithmetic for authoritative financial calculations. Keep fills distinct from summarized trades where needed, and document how partial closes, funding, fees, and unrealized PnL are handled.
+## Integration boundary
+Future provider adapters map verified API payloads into the normalized domain model. Integrations are optional and cannot own core accounting logic.

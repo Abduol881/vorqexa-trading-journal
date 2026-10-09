@@ -1,61 +1,9 @@
-const pillars = [
-  {
-    number: "01",
-    title: "Record",
-    description: "Build a clear history of trades, entries, exits, fees, and decisions.",
-  },
-  {
-    number: "02",
-    title: "Review",
-    description: "Capture the plan, the reasoning, the mistakes, and the lesson from each session.",
-  },
-  {
-    number: "03",
-    title: "Improve",
-    description: "Turn reliable trade records into meaningful performance and risk insights.",
-  },
-];
-
-export default function HomePage() {
-  return (
-    <main className="shell">
-      <header className="topbar">
-        <a className="brand" href="/" aria-label="Vorqexa Journal home">
-          <span className="brand-mark">V</span>
-          <span>vorqexa <span style={{ color: "var(--muted)", fontWeight: 400 }}>journal</span></span>
-        </a>
-        <span className="status">Product foundation · v0.1.0</span>
-      </header>
-
-      <section className="hero">
-        <div className="eyebrow">A clearer view of your trading</div>
-        <h1>Trade with intention.<br />Review with clarity.</h1>
-        <p>
-          A dedicated workspace for recording trades, understanding risk, and
-          learning from every decision. Built independently so the journal can
-          evolve on its own.
-        </p>
-        <div className="notice">
-          <strong style={{ color: "var(--text)" }}>Foundation scaffold</strong>
-          <br />
-          This clean starting point is not a finished journal yet. Authentication,
-          saved trades, calculations, and integrations will be added in tested stages.
-        </div>
-      </section>
-
-      <section aria-label="Product pillars" className="grid">
-        {pillars.map((pillar) => (
-          <article className="card" key={pillar.number}>
-            <div className="card-number">{pillar.number}</div>
-            <h2>{pillar.title}</h2>
-            <p>{pillar.description}</p>
-          </article>
-        ))}
-      </section>
-
-      <footer>
-        Vorqexa Journal · Independent product · Never share wallet seed phrases or private keys.
-      </footer>
-    </main>
-  );
-}
+import { AppShell } from "@/components/layout/app-shell";
+import { StatCard } from "@/components/ui/stat-card";
+const metrics=[{label:"Net P&L",value:"$0.00",detail:"Your recorded trades will appear here"},{label:"Win rate",value:"—",detail:"Calculated from closed trades"},{label:"Trades logged",value:"0",detail:"Manual entries and imports"},{label:"Avg. R multiple",value:"—",detail:"Available when risk data is recorded"}];
+export default function DashboardPage(){return <AppShell active="Overview">
+<section className="page-heading"><div><p className="eyebrow">YOUR WORKSPACE</p><h1>Trading overview</h1><p className="muted">A clear record of your decisions, one trade at a time.</p></div><span className="status-pill"><span className="status-dot"/>Foundation mode</span></section>
+<section className="stats-grid" aria-label="Trading performance summary">{metrics.map(metric=><StatCard key={metric.label} {...metric}/>)}</section>
+<section className="content-grid"><div className="panel activity-panel"><div className="panel-heading"><div><p className="eyebrow">RECORDS</p><h2>Recent trades</h2></div><span className="muted small">0 records</span></div><div className="empty-state"><div className="empty-icon" aria-hidden="true">↗</div><h3>Your trading history starts here</h3><p>When trade entry is connected to your private database, your latest trades will appear here.</p><span className="secondary-button" aria-disabled="true">Trade entry · planned</span></div></div>
+<aside className="panel next-panel"><p className="eyebrow">BUILT FOR REVIEW</p><h2>Process over impulse.</h2><p className="muted">Capture the setup, risk, execution, and lesson behind each trade—not just the result.</p><ul className="feature-list"><li><span>01</span><div><strong>Record</strong><p>Manual trades first</p></div></li><li><span>02</span><div><strong>Reflect</strong><p>Notes, tags, and screenshots</p></div></li><li><span>03</span><div><strong>Improve</strong><p>Metrics derived from your records</p></div></li></ul></aside></section>
+<p className="footnote">Preview scaffold · No real account data is connected yet.</p></AppShell>}
