@@ -1,26 +1,31 @@
 # Architecture
 
-## Layers
-- `src/app`: routing, page composition, route handlers.
-- `src/components`: shared presentation only.
-- `src/features/trades/domain`: framework-independent trade types and calculations.
-- `src/features/trades/application`: input validation and use-case boundary.
-- `src/features/trades/data`: repository contract; implement against the authenticated Supabase session.
-- `src/features/analytics`: pure summaries derived from domain trade records.
-- `src/lib/supabase`: browser/server clients; never expose service-role credentials.
-- `supabase/migrations`: schema, constraints and RLS.
+## Product boundary
+Vorqexa Journal is standalone. Manual entry and CSV import work without any trading-account connection. Automatic journaling is restricted to eligible trades executed through Vorqexa DEX. External broker/exchange integrations are out of scope for the initial release.
+
+## Runtime components
+- **Web:** Next.js App Router for pages, server components and short request/response route handlers.
+- **Application/domain:** TypeScript use cases, validation and framework-independent trading rules.
+- **Database/auth/storage:** Supabase PostgreSQL, Supabase Auth, Row-Level Security (RLS), private object storage.
+- **Sync worker:** scheduled/background processing for Orderly data after the integration is verified. Do not rely on a web request to run long synchronization jobs.
+- **CI:** GitHub Actions for typecheck, lint, unit tests and production build.
 
 ## Dependency direction
-Routes call application services; services validate and use repositories; repositories persist under the verified session. Domain math must not depend on UI, Next.js, or Supabase. Analytics must reuse domain PnL rules.
+Routes/UI call application services. Application services validate input and depend on domain rules plus repository/provider interfaces. Data adapters implement those interfaces. Domain calculations must not depend on Next.js, Supabase or provider SDKs. Analytics reuses the same domain P&L rules as trade detail views.
 
-## Core entities
-Profile, Trade, JournalEntry, Tag, and TradeTag. A future attachments feature should keep object storage private and authorize each read/write.
+## Import flow
+Manual form and CSV preview/import -> validation -> normalized trade input -> application service -> repository -> shared trade history.
+Vorqexa DEX sync -> authenticated provider adapter -> normalized executions -> idempotent execution store -> reconciliation/grouping -> shared trade history.
+All paths preserve provenance. Provider sync must not overwrite user-authored notes or tags.
+
+## Core records
+Profile/preferences; normalized Trade; individual Execution; linked TradingAccount; ImportRun/sync state; JournalEntry; Tag/TradeTag; future private attachment metadata.
 
 ## Accounting
-Long gross PnL = (exit - entry) × quantity. Short gross PnL = (entry - exit) × quantity. Net PnL = gross PnL - fees + funding; funding is a signed cash flow, positive when received. Open trades have no realized PnL. Closed trades require exit price and close timestamp. Multi-fill execution/lot modeling may be required before reliable exchange sync.
+Closed long gross P&L = (exit - entry) * quantity. Closed short gross P&L = (entry - exit) * quantity. Net P&L = gross P&L - fees + signed funding (positive means received). Open trades have no realized P&L. Order, execution and grouped position are distinct concepts. Multi-fill positions must be grouped using documented, tested rules before analytics are authoritative. Use PostgreSQL numeric for financial values and define rounding at API/UI boundaries.
 
 ## Tenant isolation
-Supabase Auth identifies the user. Every user-owned table requires RLS. Server operations derive identity from the verified session—not a request-body user ID. Repository user scoping is defense in depth; RLS is authoritative.
+Derive user identity from a verified Supabase session. Never trust a client-supplied user ID. Every user-owned table has RLS and ownership-safe foreign keys. Service credentials must never reach the browser. RLS is the security boundary; repository scoping is defense in depth.
 
-## Integration boundary
-Future provider adapters map verified API payloads into the normalized domain model. Integrations are optional and cannot own core accounting logic.
+## Integration constraints
+A Vorqexa broker ID, wallet connection or public market-data access does not prove permission to read private user executions. Verify Orderly private API access, account binding, history pagination, rate limits, authentication and revocation behavior before implementation. Automatic sync is unavailable until this gate passes.
