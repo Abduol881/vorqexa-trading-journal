@@ -2,10 +2,8 @@ create extension if not exists pgcrypto;
 
 create table public.profiles (
  id uuid primary key references auth.users(id) on delete cascade,
- display_name text,
- timezone text not null default 'UTC',
- created_at timestamptz not null default now(),
- updated_at timestamptz not null default now()
+ display_name text, timezone text not null default 'UTC',
+ created_at timestamptz not null default now(), updated_at timestamptz not null default now()
 );
 create table public.trades (
  id uuid primary key default gen_random_uuid(),
@@ -17,14 +15,12 @@ create table public.trades (
  quantity numeric(30,12) not null check(quantity>0),
  entry_price numeric(30,12) not null check(entry_price>0),
  exit_price numeric(30,12) check(exit_price is null or exit_price>0),
- fees numeric(30,12) not null default 0 check(fees>=0),
- funding numeric(30,12) not null default 0,
+ fees numeric(30,12) not null default 0 check(fees>=0), funding numeric(30,12) not null default 0,
  stop_loss numeric(30,12) check(stop_loss is null or stop_loss>0),
  take_profit numeric(30,12) check(take_profit is null or take_profit>0),
  opened_at timestamptz not null, closed_at timestamptz,
  setup text check(setup is null or char_length(setup)<=3000),
- source text not null default 'manual' check(source in ('manual','csv','orderly')),
- external_id text,
+ source text not null default 'manual' check(source in ('manual','csv','orderly')), external_id text,
  created_at timestamptz not null default now(), updated_at timestamptz not null default now(),
  check((status='open' and exit_price is null and closed_at is null) or (status='closed' and exit_price is not null and closed_at is not null)),
  unique(user_id,id), unique(user_id,source,external_id)
@@ -35,11 +31,11 @@ create index trades_user_instrument_idx on public.trades(user_id,instrument);
 
 create table public.journal_entries (
  id uuid primary key default gen_random_uuid(), user_id uuid not null references auth.users(id) on delete cascade,
- trade_id uuid references public.trades(id) on delete cascade,
- title text not null check(char_length(title) between 1 and 160),
+ trade_id uuid, title text not null check(char_length(title) between 1 and 160),
  body text not null default '' check(char_length(body)<=12000), mood text,
  lesson text check(lesson is null or char_length(lesson)<=3000),
- created_at timestamptz not null default now(), updated_at timestamptz not null default now()
+ created_at timestamptz not null default now(), updated_at timestamptz not null default now(),
+ foreign key(user_id,trade_id) references public.trades(user_id,id) on delete cascade
 );
 create table public.tags (
  id uuid primary key default gen_random_uuid(), user_id uuid not null references auth.users(id) on delete cascade,
