@@ -1,6 +1,8 @@
 import type { Summary, Trade, TradeResult, TradeWithResult } from "./types";
 
-export function calcTrade(t: Trade): TradeResult {
+export function calcTrade(
+  t: Pick<Trade, "side" | "size" | "entry" | "exit" | "fees" | "stop">,
+): TradeResult {
   const dir = t.side === "short" ? -1 : 1;
   const pnl = dir * (t.exit - t.entry) * t.size - t.fees;
   const risk =
